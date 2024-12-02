@@ -8,7 +8,7 @@
 
         public string? AuthorName { get; set; }
 
-        public DateTime ReleaseYear { get; set; }
+        public int ReleaseYear { get; set; }
 
         public int Quantity { get; set; }
     }
