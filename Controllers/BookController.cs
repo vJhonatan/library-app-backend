@@ -1,6 +1,7 @@
 ﻿using Library_Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Library_Backend.Models;
 
 namespace Library_Backend.Controllers
 {
@@ -146,8 +147,14 @@ namespace Library_Backend.Controllers
             }
         };
 
-       //[HttpGet]
-       //TODO: Rota para consultar Livros
+        //[HttpGet]
+        //TODO: Rota para consultar Livros
+        [HttpGet]
+        public ActionResult<List<BookModel>>
+            ListBooks()
+        {
+            return Ok(books);
+        }
 
        //[HttpGet("{id}")]
        //TODO: Rota para consultar livro por ID só para verificar quantidade.
