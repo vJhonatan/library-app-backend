@@ -27,7 +27,6 @@ Projeto para gerenciamento de locação de livros desenvolvido em .NET.
   - **Nome do Locatário**: Nome de quem alugou o livro.
   - **Ano de Nascimento**: Ano de nascimento do locatário.
   - **Id do Livro**: Identificador do livro alugado.
-  - **Data da Locação**: Data em que o livro foi alugado.
 
 ---
 
