@@ -156,13 +156,63 @@ namespace Library_Backend.Controllers
             return Ok(books);
         }
 
-       //[HttpGet("{id}")]
-       //TODO: Rota para consultar livro por ID só para verificar quantidade.
 
-       //[HttpPost]
-       //TODO: Rota para alugar um Livro
+        //TODO: Rota para consultar livro por ID só para verificar quantidade.
+        [HttpGet("{id}")]
+        public ActionResult<int>
+            GetBookQuantityById(int id)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
 
-       //[HttpPut("{id}")]
-       //TODO: Rota para devolução de livro
+            if (book == null) 
+            { 
+                return NotFound(new {message = "Book not found"});
+            }
+
+            var bookDetails = new
+            {
+                Name = book.Name,
+                Quantitty = book.Quantity
+            };
+
+            return Ok(bookDetails);
+        }
+
+
+        [HttpPost("alugar/{id}")]
+        //TODO: Rota para alugar um Livro
+        public ActionResult RentBook(int id)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
+
+            if(book == null)
+            {
+                return NotFound(new { Message = "Book not found." });
+            }
+
+            if (book.Quantity <= 0)
+            {
+                return BadRequest(new { Message = "There are no books to rent." });
+            }
+
+            book.Quantity--;
+
+            return Ok(new { message = "Successfully rent book", Book = book});
+        }
+
+        [HttpPost("devolver/{id}")]
+        //TODO: Rota para devolução de livro
+        public ActionResult ReturnBook(int id)
+        {
+            var book = books.FirstOrDefault(x => x.Id == id);
+
+            if(book == null)
+            {
+                return NotFound(new { Message = "Book not found." });
+            }
+
+            book.Quantity++;
+            return Ok(new { Message = "Book returned successfully.", Book = book });
+        }
     }
 }
