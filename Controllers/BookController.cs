@@ -5,11 +5,11 @@ using Library_Backend.Models;
 
 namespace Library_Backend.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/books")]
     [ApiController]
     public class BookController : ControllerBase
     {
-        private static List<BookModel> books = new List<BookModel>
+        private static List<BookModel> Books = new List<BookModel>
         {
             new BookModel
             {
@@ -147,72 +147,81 @@ namespace Library_Backend.Controllers
             }
         };
 
-        //[HttpGet]
-        //TODO: Rota para consultar Livros
+        private static List<RentalModel> Rentals = new List<RentalModel>();
+
         [HttpGet]
-        public ActionResult<List<BookModel>>
-            ListBooks()
+        public ActionResult<List<BookModel>> ListBooks()
         {
-            return Ok(books);
+            return Ok(Books);
         }
 
-
-        //TODO: Rota para consultar livro por ID só para verificar quantidade.
         [HttpGet("{id}")]
-        public ActionResult<int>
-            GetBookQuantityById(int id)
+        public ActionResult GetBookQuantityById(int id)
         {
-            var book = books.FirstOrDefault(x => x.Id == id);
+            var book = Books.FirstOrDefault(x => x.Id == id);
 
-            if (book == null) 
-            { 
-                return NotFound(new {message = "Book not found"});
-            }
+            if (book == null) return NotFound("Book not found");
 
             var bookDetails = new
             {
                 Name = book.Name,
-                Quantitty = book.Quantity
+                Quantity = book.Quantity
             };
 
             return Ok(bookDetails);
         }
 
 
-        [HttpPost("alugar/{id}")]
-        //TODO: Rota para alugar um Livro
-        public ActionResult RentBook(int id)
+        [HttpPost("rent/{id}")] 
+        public ActionResult RentBook(int id, [FromBody] RentalModel request)
         {
-            var book = books.FirstOrDefault(x => x.Id == id);
+            var book = Books.FirstOrDefault(x => x.Id == id);
 
-            if(book == null)
+            if(book == null) return NotFound("Book not found.");
+
+            if (book.Quantity <= 0) return BadRequest("There are no books to rent.");
+
+            if (string.IsNullOrWhiteSpace(request.Name) || request.Name == "string") return BadRequest("The renter's name is required.");
+
+            if (request.BirthDate == default || request.BirthDate == DateTime.Now) return BadRequest("The renter's birth date is required.");
+
+            var rental = new RentalModel
             {
-                return NotFound(new { Message = "Book not found." });
-            }
+                Id = Rentals.Count + 1,
+                Name = request.Name,
+                BirthDate = request.BirthDate,
+                IdBook = book.Id,
+                RentalDate = DateTime.Now
+            };
 
-            if (book.Quantity <= 0)
-            {
-                return BadRequest(new { Message = "There are no books to rent." });
-            }
-
+            Rentals.Add(rental);
             book.Quantity--;
 
-            return Ok(new { message = "Successfully rent book", Book = book});
+            return Ok($"Successfully rented book {book.Name} for rental {rental.Name}!");
         }
 
-        [HttpPost("devolver/{id}")]
-        //TODO: Rota para devolução de livro
-        public ActionResult ReturnBook(int id)
+        [HttpPut("return/{rentalId}")]
+        public ActionResult ReturnBook(int rentalId)
         {
-            var book = books.FirstOrDefault(x => x.Id == id);
+            var rental = Rentals.FirstOrDefault(r => r.Id == rentalId);
 
-            if(book == null)
-            {
-                return NotFound(new { Message = "Book not found." });
-            }
+            if (rental == null) return NotFound("Rental not found.");
+
+            var book = Books.FirstOrDefault(b => b.Id == rental.IdBook);
+
+            if (book == null) return NotFound("Book not found.");
 
             book.Quantity++;
-            return Ok(new { Message = "Book returned successfully.", Book = book });
+
+            Rentals.Remove(rental);
+
+            return Ok($"Book {book.Name} returned successfully.");
+        }
+
+        [HttpGet("rentals")]
+        public ActionResult<List<RentalModel>> GetRentals()
+        {
+            return Ok(Rentals);
         }
     }
 }
