@@ -183,8 +183,6 @@ namespace Library_Backend.Controllers
 
             if (string.IsNullOrWhiteSpace(request.Name) || request.Name == "string") return BadRequest("The renter's name is required.");
 
-            if (request.BirthDate == default || request.BirthDate == DateTime.Now) return BadRequest("The renter's birth date is required.");
-
             var rental = new RentalModel
             {
                 Id = Rentals.Count + 1,
