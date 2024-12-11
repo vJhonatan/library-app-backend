@@ -1,7 +1,7 @@
 ﻿using Library_Backend.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Library_Backend.Models;
+using Library_Backend.Requests;
 
 namespace Library_Backend.Controllers
 {
@@ -172,30 +172,31 @@ namespace Library_Backend.Controllers
         }
 
 
-        [HttpPost("rent/{id}")] 
-        public ActionResult RentBook(int id, [FromBody] RentalModel request)
+        [HttpPost("rent/{bookId}")] 
+        public ActionResult RentBook(int bookId, [FromBody] RentalRequests request)
         {
-            var book = Books.FirstOrDefault(x => x.Id == id);
+            if (string.IsNullOrWhiteSpace(request.Name) || request.Name == "string") return BadRequest(new { message = "The renter's name is required." });
 
-            if(book == null) return NotFound("Book not found.");
+            var book = Books.FirstOrDefault(x => x.Id == bookId);
 
-            if (book.Quantity <= 0) return BadRequest("There are no books to rent.");
+            if(book == null) return NotFound(new { message = "Book not found."});
 
-            if (string.IsNullOrWhiteSpace(request.Name) || request.Name == "string") return BadRequest("The renter's name is required.");
+            if (book.Quantity <= 0) return BadRequest(new { message = "There are no books to rent." });
 
             var rental = new RentalModel
             {
                 Id = Rentals.Count + 1,
                 Name = request.Name,
                 BirthDate = request.BirthDate,
-                IdBook = book.Id,
-                RentalDate = DateTime.Now
+                BookId = book.Id,
+                Created_at = DateTime.Now,
+                Updated_at = null
             };
 
             Rentals.Add(rental);
             book.Quantity--;
 
-            return Ok($"Successfully rented book {book.Name} for rental {rental.Name}!");
+            return Ok(new { message = $"Successfully rented book {book.Name} for rental {rental.Name}!" });
         }
 
         [HttpPut("return/{rentalId}")]
@@ -205,7 +206,7 @@ namespace Library_Backend.Controllers
 
             if (rental == null) return NotFound("Rental not found.");
 
-            var book = Books.FirstOrDefault(b => b.Id == rental.IdBook);
+            var book = Books.FirstOrDefault(b => b.Id == rental.BookId);
 
             if (book == null) return NotFound("Book not found.");
 
