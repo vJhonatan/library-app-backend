@@ -1,6 +1,6 @@
 ﻿namespace Library_Backend.Models
 {
-    public class RentalModel
+    public class RentModel
     {
         public int Id { get; set; }
 

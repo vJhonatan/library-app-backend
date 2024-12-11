@@ -147,7 +147,7 @@ namespace Library_Backend.Controllers
             }
         };
 
-        private static List<RentalModel> Rentals = new List<RentalModel>();
+        private static List<RentModel> Rents = new List<RentModel>();
 
         [HttpGet]
         public ActionResult<List<BookModel>> ListBooks()
@@ -173,7 +173,7 @@ namespace Library_Backend.Controllers
 
 
         [HttpPost("rent/{bookId}")] 
-        public ActionResult RentBook(int bookId, [FromBody] RentalRequests request)
+        public ActionResult RentBook(int bookId, [FromBody] RentRequests request)
         {
             if (string.IsNullOrWhiteSpace(request.Name) || request.Name == "string") return BadRequest(new { message = "The renter's name is required." });
 
@@ -183,9 +183,9 @@ namespace Library_Backend.Controllers
 
             if (book.Quantity <= 0) return BadRequest(new { message = "There are no books to rent." });
 
-            var rental = new RentalModel
+            var rent = new RentModel
             {
-                Id = Rentals.Count + 1,
+                Id = Rents.Count + 1,
                 Name = request.Name,
                 BirthDate = request.BirthDate,
                 BookId = book.Id,
@@ -193,34 +193,34 @@ namespace Library_Backend.Controllers
                 Updated_at = null
             };
 
-            Rentals.Add(rental);
+            Rents.Add(rent);
             book.Quantity--;
 
-            return Ok(new { message = $"Successfully rented book {book.Name} for rental {rental.Name}!" });
+            return Ok(new { message = $"Successfully rented book {book.Name} for rental {rent.Name}!" });
         }
 
-        [HttpPut("return/{rentalId}")]
-        public ActionResult ReturnBook(int rentalId)
+        [HttpPut("return/{rentId}")]
+        public ActionResult ReturnBook(int rentId)
         {
-            var rental = Rentals.FirstOrDefault(r => r.Id == rentalId);
+            var rent = Rents.FirstOrDefault(r => r.Id == rentId);
 
-            if (rental == null) return NotFound("Rental not found.");
+            if (rent == null) return NotFound("Rental not found.");
 
-            var book = Books.FirstOrDefault(b => b.Id == rental.BookId);
+            var book = Books.FirstOrDefault(b => b.Id == rent.BookId);
 
             if (book == null) return NotFound("Book not found.");
 
             book.Quantity++;
 
-            Rentals.Remove(rental);
+            Rents.Remove(rent);
 
             return Ok($"Book {book.Name} returned successfully.");
         }
 
-        [HttpGet("rentals")]
-        public ActionResult<List<RentalModel>> GetRentals()
+        [HttpGet("rents")]
+        public ActionResult<List<RentModel>> GetRents()
         {
-            return Ok(Rentals);
+            return Ok(Rents);
         }
     }
 }
