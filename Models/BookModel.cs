@@ -11,5 +11,7 @@
         public int ReleaseYear { get; set; }
 
         public int Quantity { get; set; }
+
+        public string? PathImage { get; set; }
     }
 }

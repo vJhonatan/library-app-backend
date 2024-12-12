@@ -6,7 +6,7 @@
 
         public string Name { get; set; } = String.Empty;
 
-        public DateTime BirthDate { get; set; }
+        public int BirthDate { get; set; }
 
         public int BookId { get; set; }
 

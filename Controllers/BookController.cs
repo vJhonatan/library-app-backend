@@ -17,7 +17,8 @@ namespace Library_Backend.Controllers
                 Name = "Dom Casmurro",
                 AuthorName = "Machado de Assis",
                 ReleaseYear = 1899,
-                Quantity = 2
+                Quantity = 2,
+                PathImage = "1.jpg"
             },
 
             new BookModel
@@ -26,7 +27,9 @@ namespace Library_Backend.Controllers
                 Name = "Memórias Póstumas de Brás Cubas",
                 AuthorName = "Machado de Assis",
                 ReleaseYear = 1881,
-                Quantity = 3
+                Quantity = 3,
+                PathImage = "2.jpg"
+
             },
 
             new BookModel
@@ -35,7 +38,8 @@ namespace Library_Backend.Controllers
                 Name = "Grande Sertão: Veredas",
                 AuthorName = "João Guimarães Rosa",
                 ReleaseYear = 1956,
-                Quantity = 4
+                Quantity = 4,
+                PathImage = "3.jpg"
             },
 
             new BookModel
@@ -44,7 +48,8 @@ namespace Library_Backend.Controllers
                 Name = "O Cortiço",
                 AuthorName = "Aluísio Azevedo",
                 ReleaseYear = 1890,
-                Quantity = 4
+                Quantity = 4,
+                PathImage = "4.jpg"
             },
 
             new BookModel
@@ -53,7 +58,8 @@ namespace Library_Backend.Controllers
                 Name = "Iracema",
                 AuthorName = "José de Alencar",
                 ReleaseYear = 1865,
-                Quantity = 1
+                Quantity = 1,
+                PathImage = "5.jpg"
             },
 
             new BookModel
@@ -62,7 +68,8 @@ namespace Library_Backend.Controllers
                 Name = "Macunaíma",
                 AuthorName = "Mário de Andrade",
                 ReleaseYear = 1928,
-                Quantity = 11
+                Quantity = 11,
+                PathImage = "6.jpg"
             },
 
             new BookModel
@@ -71,7 +78,8 @@ namespace Library_Backend.Controllers
                 Name = "Capitães da Areia",
                 AuthorName = "Jorge Amado",
                 ReleaseYear = 1937,
-                Quantity = 2
+                Quantity = 2,
+                PathImage = "7.jpg"
             },
 
             new BookModel
@@ -80,7 +88,8 @@ namespace Library_Backend.Controllers
                 Name = "Vidas Secas",
                 AuthorName = "Graciliano Ramos",
                 ReleaseYear = 1938,
-                Quantity = 9
+                Quantity = 9,
+                PathImage = "8.jpg"
             },
 
             new BookModel
@@ -89,7 +98,8 @@ namespace Library_Backend.Controllers
                 Name = "A Moreninha",
                 AuthorName = "Joaquim Manuel de Macedo",
                 ReleaseYear = 1844,
-                Quantity = 2
+                Quantity = 2,
+                PathImage = "9.jpg"
             },
 
             new BookModel
@@ -98,7 +108,8 @@ namespace Library_Backend.Controllers
                 Name = "O Tempo e o Vento",
                 AuthorName = "Erico Verissimo",
                 ReleaseYear = 1949,
-                Quantity = 1
+                Quantity = 1,
+                PathImage = "10.jpg"
             },
 
             new BookModel
@@ -107,7 +118,8 @@ namespace Library_Backend.Controllers
                 Name = "A Hora da Estrela",
                 AuthorName = "Clarice Lispector",
                 ReleaseYear = 1977,
-                Quantity = 1
+                Quantity = 1,
+                PathImage = "11.jpg"
             },
 
             new BookModel
@@ -116,7 +128,8 @@ namespace Library_Backend.Controllers
                 Name = "O Quinze",
                 AuthorName = "Rachel de Queiroz",
                 ReleaseYear = 1930,
-                Quantity = 1
+                Quantity = 1,
+                PathImage = "12.jpg"
             },
 
             new BookModel
@@ -125,7 +138,8 @@ namespace Library_Backend.Controllers
                 Name = "Menino do Engenho",
                 AuthorName = "José Lins do Rego",
                 ReleaseYear = 1932,
-                Quantity = 5
+                Quantity = 5,
+                PathImage = "13.jpg"
             },
 
             new BookModel
@@ -134,7 +148,8 @@ namespace Library_Backend.Controllers
                 Name = "Sagarana",
                 AuthorName = "João Guimarães Rosa",
                 ReleaseYear = 1946,
-                Quantity = 3
+                Quantity = 3,
+                PathImage = "14.jpg"
             },
 
             new BookModel
@@ -143,7 +158,8 @@ namespace Library_Backend.Controllers
                 Name = "Fogo Morto",
                 AuthorName = "José Lins do Rego",
                 ReleaseYear = 1943,
-                Quantity = 1
+                Quantity = 1,
+                PathImage = "15.jpg"
             }
         };
 
@@ -212,15 +228,28 @@ namespace Library_Backend.Controllers
 
             book.Quantity++;
 
-            Rents.Remove(rent);
+            rent.Updated_at = DateTime.Now;
 
-            return Ok($"Book {book.Name} returned successfully.");
+            return Ok(new { message = $"Book {book.Name} returned successfully." });
         }
 
         [HttpGet("rents")]
         public ActionResult<List<RentModel>> GetRents()
         {
-            return Ok(Rents);
+            var rentsWithBooks = Rents.Select(rent => new
+            {
+                RentId = rent.Id,
+                RenterName = rent.Name,
+                BirthDate = rent.BirthDate,
+                RentedAt = rent.Created_at,
+                BookDetails = Books.FirstOrDefault(book => book.Id == rent.BookId),
+                Updated_at = rent.Updated_at
+
+            })
+           .OrderBy(rent => rent.Updated_at)
+            .ToList();
+
+            return Ok(rentsWithBooks);
         }
     }
 }
