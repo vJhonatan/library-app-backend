@@ -1,6 +1,6 @@
 ﻿namespace Library_Backend.Requests
 {
-    public class RentalRequests
+    public class RentRequests
     {
         public string Name { get; set; } = String.Empty;
 

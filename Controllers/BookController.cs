@@ -204,7 +204,7 @@ namespace Library_Backend.Controllers
         {
             var rent = Rents.FirstOrDefault(r => r.Id == rentId);
 
-            if (rent == null) return NotFound("Rental not found.");
+            if (rent == null) return NotFound("Rent not found.");
 
             var book = Books.FirstOrDefault(b => b.Id == rent.BookId);
 
